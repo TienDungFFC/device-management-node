@@ -1,37 +1,65 @@
-const User = require("../models/user");
+const db = require("../models");
+const bcrypt = require("bcrypt");
 
 const userController = {
-  getAllUsers: async (req, res) => {
-    try {
-      res.status(200).json({ status: "success" });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  },
+  login: async (req, res) => {
+    const { username, password } = req.body;
 
-  getUserById: async (req, res) => {
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ error: "Username and password are required" });
+    }
+
     try {
-      const user = await User.findById(req.params.id);
+      const user = db
+        .prepare("SELECT id, password FROM users WHERE username = ?")
+        .get(username);
+
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(400).json({ error: "Invalid username or password" });
       }
-      res.json(user);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
+
+      const passwordMatch = await bcrypt.compare(password, user.password);
+
+      if (!passwordMatch) {
+        return res.status(400).json({ error: "Invalid username or password" });
+      }
+
+      res.status(200).json({ message: "Login successful", userId: user.id });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
   },
 
-  createUser: async (req, res) => {
-    const user = new User({
-      name: req.body.name,
-      email: req.body.email,
-    });
+  register: async (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
 
     try {
-      const newUser = await user.save();
-      res.status(201).json(newUser);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
+      const userExists =
+        db
+          .prepare("SELECT COUNT(*) as count FROM users WHERE username = ?")
+          .get(username).count > 0;
+
+      if (userExists) {
+        return res.status(400).json({ error: "Username already exists" });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const stmt = db.prepare(
+        "INSERT INTO users (username, password) VALUES (?, ?)"
+      );
+      const result = stmt.run(username, hashedPassword);
+      res.status(201).json({
+        message: "User registered successfully",
+        userId: result.lastInsertRowid,
+      });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
   },
 };

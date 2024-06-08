@@ -1,9 +1,7 @@
-// src/routes/userRoutes.js
-
 const express = require("express");
 const router = express.Router();
-const deviceController = require("../controllers/userController");
+const deviceController = require("../controllers/deviceController");
 
-router.get("/user/", deviceController.getAllUsers);
+router.post("/register", deviceController.registerDevice);
 
 module.exports = router;
