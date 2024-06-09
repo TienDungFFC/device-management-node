@@ -18,13 +18,20 @@ const deviceController = {
       const existingDevice = db
         .prepare("SELECT * FROM Devices WHERE id = ?")
         .get(id);
-      if (existingDevice) {
-        const updateDevice = db.prepare(
-          "UPDATE Devices SET name = ?, user_id = ? WHERE id = ?"
-        );
-        updateDevice.run(name, userId, id);
 
-        res.status(200).json({ message: "Device updated successfully" });
+      if (existingDevice) {
+        if (existingDevice.user_id && existingDevice.user_id !== userId) {
+          res
+            .status(403)
+            .json({ message: "Device already registered by another user" });
+        } else {
+          const updateDevice = db.prepare(
+            "UPDATE Devices SET name = ?, user_id = ? WHERE id = ?"
+          );
+          updateDevice.run(name, userId, id);
+
+          res.status(200).json({ message: "Device updated successfully" });
+        }
       } else {
         res.status(404).json({ message: "Device not found" });
       }
