@@ -40,6 +40,20 @@ const deviceController = {
       res.status(500).json({ message: "Internal server error" });
     }
   },
+
+  deleteDevice: async (req, res) => {
+    try {
+      const deviceId = req.params.deviceId;
+      const updateDevice = db.prepare(
+        "UPDATE Devices SET user_id = NULL WHERE id = ?"
+      );
+      updateDevice.run(deviceId);
+      res.status(200).json({ message: "Device deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting device:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
 };
 
 module.exports = deviceController;
