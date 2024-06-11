@@ -8,7 +8,7 @@ const userController = {
     if (!username || !password) {
       return res
         .status(400)
-        .json({ error: "Username and password are required" });
+        .json({ message: "Username and password are required" });
     }
 
     try {
@@ -17,25 +17,29 @@ const userController = {
         .get(username);
 
       if (!user) {
-        return res.status(400).json({ error: "Invalid username or password" });
+        return res
+          .status(400)
+          .json({ message: "Invalid username or password" });
       }
 
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (!passwordMatch) {
-        return res.status(400).json({ error: "Invalid username or password" });
+        return res
+          .status(400)
+          .json({ message: "Invalid username or password" });
       }
 
       res.status(200).json({ message: "Login successful", userId: user.id });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ message: err.message });
     }
   },
 
   register: async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) {
-      return res.status(400).json({ error: "All fields are required" });
+      return res.status(400).json({ message: "All fields are required" });
     }
 
     try {
@@ -45,7 +49,7 @@ const userController = {
           .get(username).count > 0;
 
       if (userExists) {
-        return res.status(400).json({ error: "Username already exists" });
+        return res.status(400).json({ message: "Username already exists" });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -59,7 +63,7 @@ const userController = {
         userId: result.lastInsertRowid,
       });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ message: err.message });
     }
   },
 };
