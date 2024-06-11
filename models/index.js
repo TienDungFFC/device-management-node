@@ -12,7 +12,8 @@
 //   console.log("Database & tables created!");
 // });
 
-const db = require("better-sqlite3")("C:/Users/Admin/device-management.db");
+console.log("process db ", process.env.SQLITE_PATH)
+const db = require("better-sqlite3")(process.env.SQLITE_PATH || "/device-management.db");
 db.pragma("journal_mode = WAL");
 const row = db.prepare("SELECT * FROM Devices WHERE id = 1");
 console.log(row.id);

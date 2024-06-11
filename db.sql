@@ -9,7 +9,7 @@ CREATE TABLE Users (
 );
 
 CREATE TABLE Devices (
-    id TEXT PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     name TEXT NULL,
     user_id INTEGER,
     status BOOLEAN NOT NULL DEFAULT 0,
@@ -41,9 +41,9 @@ VALUES
 
 INSERT INTO Devices (id, name, user_id, status) 
 VALUES 
-  ('device1', 'Device 1', 1, 1),
-  ('device2', 'Device 2', 1, 0),
-  ('device3', 'Device 3', 2, 1);
+  (1, 'Device 1', 1, 1),
+  (2, 'Device 2', 1, 0),
+  (3, 'Device 3', 2, 1);
 
 INSERT INTO Videos (filename, user_id, created_at) 
 VALUES 

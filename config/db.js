@@ -4,7 +4,7 @@ const { Sequelize } = require("sequelize");
 
 const sequelize = new Sequelize({
   dialect: "sqlite",
-  storage: "C:/Users/Admin/device-management.db",
+  storage: process.env.SQLITE_PATH || "/device-management.db",
 });
 
 const connectDB = async () => {
